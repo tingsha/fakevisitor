@@ -70,7 +70,7 @@ public class Controller {
         );
     }
 
-    //http://visitorcounter1.000webhostapp.com/ - test site (host)
+    //http://visitorcounter1.000webhostapp.com/ - test site
     private Service<Void> visitorService;
     private Service<Void> createVisitorService(){
         return new Service<>() {
