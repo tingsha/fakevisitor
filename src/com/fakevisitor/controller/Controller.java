@@ -4,14 +4,26 @@ import com.fakevisitor.Toast;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.CookieHandler;
+import java.net.CookieManager;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
 public class Controller {
@@ -58,11 +70,9 @@ public class Controller {
         );
     }
 
-    //http://visitorcounter1.000webhostapp.com/
+    //http://visitorcounter1.000webhostapp.com/ - test site
     private Service<Void> visitorService;
-
     private Service<Void> createVisitorService(){
-        double progressTick = 1/Double.parseDouble(repetitionsInput.getText());
         return new Service<>() {
             @Override
             protected Task<Void> createTask() {
@@ -73,35 +83,17 @@ public class Controller {
                         final CountDownLatch latch = new CountDownLatch(1);
                         for (int i = 0; i < Integer.parseInt(repetitionsInput.getText()); i++) {
                             int finalI = i;
-                            Platform.runLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        //FX Stuff done here
-                                        java.net.CookieManager manager = new java.net.CookieManager();
-                                        java.net.CookieHandler.setDefault(manager);
-                                        Tab tab = new Tab();
-                                        tab.setText("" + (finalI + 1));
-                                        WebView webView = new WebView();
-                                        WebEngine webEngine = webView.getEngine();
-                                        webEngine.load(urlInput.getText().equals("") ? URL : urlInput.getText());
-                                        tab.setContent(webView);
-                                        tabPane.getTabs().add(tab);
-                                        manager.getCookieStore().removeAll();
-                                        progressLabel.setText(finalI+1 + "/" + Integer.parseInt(repetitionsInput.getText()));
-                                        progressBar.setProgress(progressBar.getProgress() + progressTick);
-                                        if (finalI == Integer.parseInt(repetitionsInput.getText())-1){
-                                            progressBar.setProgress(1);
-                                            progressBar.setStyle("-fx-accent: green");
-                                            startBtn.setDisable(false);
-                                        }
-                                    } finally {
-                                        latch.countDown();
-                                    }
+                            Platform.runLater(() -> {
+                                try {
+                                    loadNewTab(finalI);
+                                } catch (IOException | InterruptedException e) {
+                                    e.printStackTrace();
+                                } finally {
+                                    latch.countDown();
                                 }
                             });
                             latch.await();
-                            //Keep with the background work
+                            //background work
                             try {
                                 Thread.sleep(Integer.parseInt(delayInput.getText()) * 1000L);
                             } catch (InterruptedException e) {
@@ -114,6 +106,51 @@ public class Controller {
                 };
             }
         };
+    }
+
+    public void loadNewTab(int pageNumber) throws IOException, InterruptedException {
+        double progressTick = 1/Double.parseDouble(repetitionsInput.getText());
+        CookieManager manager = new java.net.CookieManager();
+        CookieHandler.setDefault(manager);
+        Tab tab = new Tab();
+        tab.setText("" + (pageNumber + 1));
+        WebView webView = new WebView();
+        WebEngine webEngine = webView.getEngine();
+        webEngine.load(urlInput.getText().equals("") ? URL : urlInput.getText());
+        goToRandomPage(urlInput.getText(), webEngine);
+        tab.setContent(webView);
+        if (pageNumber > 0)
+            tabPane.getTabs().remove(0);
+        tabPane.getTabs().add(tab);
+        manager.getCookieStore().removeAll();
+        progressLabel.setText(pageNumber+1 + "/" + Integer.parseInt(repetitionsInput.getText()));
+        progressBar.setProgress(progressBar.getProgress() + progressTick);
+        if (pageNumber == Integer.parseInt(repetitionsInput.getText())-1){
+            progressBar.setProgress(1);
+            progressBar.setStyle("-fx-accent: green");
+            startBtn.setDisable(false);
+            stopBtn.setDisable(true);
+        }
+    }
+
+    public void goToRandomPage(String url, WebEngine webEngine) throws IOException {
+        ArrayList<String> links = new ArrayList<>();
+        Document doc = Jsoup.connect(url).get();
+        Elements elements = doc.select("a[href]"); // a with href
+        for (Element element : elements) {
+            links.add(element.attr("href"));
+        }
+        String[] urlParts = url.split("/");
+        StringBuilder rootUrl = new StringBuilder();
+        if (urlParts.length > 2)
+            for (int i = 0; i < 3; i++){
+                rootUrl.append(urlParts[i]).append("/");
+            }
+        else
+            rootUrl.append(url);
+        links.removeIf(z -> z.equals("#") || z.equals("index.html") || !z.endsWith(".html"));
+        if (links.size() > 0)
+            webEngine.load(rootUrl + links.get(new Random().nextInt(links.size()-1)));
     }
 
     @FXML
@@ -143,7 +180,7 @@ public class Controller {
     }
 
     @FXML
-    public void onShowBrowserClick(){
+    public void showBrowserHandler(){
         tabPane.setVisible(showBrowserCb.isSelected());
     }
 }
