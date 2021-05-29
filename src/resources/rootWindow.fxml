@@ -62,7 +62,7 @@
                   <Insets right="10.0" top="10.0"/>
                </GridPane.margin>
             </TextField>
-            <Label fx:id="delay" text="Delay (sec)" GridPane.rowIndex="2">
+            <Label text="Visit duration (sec)" GridPane.rowIndex="2">
                <font>
                   <Font size="18.0"/>
                </font>

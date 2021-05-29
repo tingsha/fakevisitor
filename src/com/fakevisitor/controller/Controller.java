@@ -109,7 +109,6 @@ public class Controller {
         CookieManager manager = new java.net.CookieManager();
         CookieHandler.setDefault(manager);
         Tab tab = new Tab();
-        //tab.setText("" + (pageNumber + 1));
         WebView webView = new WebView();
         WebEngine webEngine = webView.getEngine();
         webEngine.load(urlInput.getText().equals("") ? URL : urlInput.getText());
