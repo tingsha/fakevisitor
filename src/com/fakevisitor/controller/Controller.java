@@ -4,7 +4,6 @@ import com.fakevisitor.Toast;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -15,9 +14,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
-import javax.swing.*;
-import java.io.File;
 import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -113,11 +109,11 @@ public class Controller {
         CookieManager manager = new java.net.CookieManager();
         CookieHandler.setDefault(manager);
         Tab tab = new Tab();
-        tab.setText("" + (pageNumber + 1));
+        //tab.setText("" + (pageNumber + 1));
         WebView webView = new WebView();
         WebEngine webEngine = webView.getEngine();
         webEngine.load(urlInput.getText().equals("") ? URL : urlInput.getText());
-        goToRandomPage(urlInput.getText(), webEngine);
+        goToRandomPage(urlInput.getText(), webEngine, pageNumber+1, tab);
         tab.setContent(webView);
         if (pageNumber > 0)
             tabPane.getTabs().remove(0);
@@ -133,7 +129,7 @@ public class Controller {
         }
     }
 
-    public void goToRandomPage(String url, WebEngine webEngine) throws IOException {
+    public void goToRandomPage(String url, WebEngine webEngine, int pageNumber, Tab tab) throws IOException {
         ArrayList<String> links = new ArrayList<>();
         Document doc = Jsoup.connect(url).get();
         Elements elements = doc.select("a[href]"); // a with href
@@ -149,8 +145,11 @@ public class Controller {
         else
             rootUrl.append(url);
         links.removeIf(z -> z.equals("#") || z.equals("index.html") || !z.endsWith(".html"));
-        if (links.size() > 0)
-            webEngine.load(rootUrl + links.get(new Random().nextInt(links.size()-1)));
+        if (links.size() > 0) {
+            String newUrl = rootUrl + links.get(new Random().nextInt(links.size() - 1));
+            webEngine.load(newUrl);
+            tab.setText(pageNumber + newUrl.replaceAll(".html", ""));
+        }
     }
 
     @FXML
