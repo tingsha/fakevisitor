@@ -16,13 +16,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<SplitPane dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="487.0" prefWidth="756.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fakevisitor.controller.Controller">
+<SplitPane dividerPositions="0.454855195911414" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="589.0" prefWidth="915.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.fakevisitor.controller.Controller">
    <AnchorPane fx:id="ap" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
       <VBox layoutY="-4.0" prefHeight="196.0" prefWidth="598.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <GridPane prefHeight="147.0" prefWidth="598.0">
             <columnConstraints>
-               <ColumnConstraints hgrow="SOMETIMES" maxWidth="294.0" minWidth="10.0" prefWidth="195.0" />
-               <ColumnConstraints hgrow="SOMETIMES" maxWidth="563.0" minWidth="10.0" prefWidth="559.0" />
+               <ColumnConstraints hgrow="SOMETIMES" maxWidth="294.0" minWidth="10.0" prefWidth="204.0" />
+               <ColumnConstraints hgrow="SOMETIMES" maxWidth="747.0" minWidth="10.0" prefWidth="714.0" />
             </columnConstraints>
             <rowConstraints>
                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -112,35 +112,50 @@
                </GridPane.margin>
             </Label>
          </GridPane>
-         <HBox prefHeight="44.0" prefWidth="598.0" spacing="70.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <GridPane prefHeight="57.0" prefWidth="598.0">
+           <columnConstraints>
+             <ColumnConstraints hgrow="SOMETIMES" maxWidth="294.0" minWidth="10.0" prefWidth="228.0" />
+             <ColumnConstraints hgrow="SOMETIMES" maxWidth="747.0" minWidth="10.0" prefWidth="739.0" />
+           </columnConstraints>
+           <rowConstraints>
+             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+           </rowConstraints>
+            <children>
+               <HBox prefHeight="57.0" prefWidth="243.0" spacing="20.0">
+                  <padding>
+                     <Insets left="20.0" right="20.0" top="20.0" />
+                  </padding>
+                  <Button fx:id="startBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStartClick" prefHeight="25.0" prefWidth="80.0" text="Start" />
+                  <Button fx:id="stopBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStopClick" prefHeight="25.0" prefWidth="80.0" text="Stop" />
+               </HBox>
+               <ProgressBar fx:id="progressBar" maxWidth="737.0" prefHeight="18.0" prefWidth="737.0" progress="0.0" GridPane.columnIndex="1">
+                  <GridPane.margin>
+                     <Insets right="10.0" top="8.0" />
+                  </GridPane.margin>
+               </ProgressBar>
+            </children>
+         </GridPane>
+         <HBox prefHeight="44.0" prefWidth="598.0" spacing="62.0">
             <padding>
                <Insets left="20.0" top="20.0" />
             </padding>
-            <CheckBox fx:id="showBrowserCb" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showBrowserHandler" prefHeight="20.0" prefWidth="125.0" selected="true" text="Show browser" HBox.hgrow="ALWAYS">
-               <font>
-                  <Font size="14.0" />
-               </font>
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-            </CheckBox>
-            <Button fx:id="startBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStartClick" prefHeight="25.0" prefWidth="49.0" text="Start" HBox.hgrow="ALWAYS" />
-            <Button fx:id="stopBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onStopClick" prefHeight="25.0" prefWidth="49.0" text="Stop" HBox.hgrow="ALWAYS" />
-            <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" prefHeight="18.0" prefWidth="164.0" progress="0.0" HBox.hgrow="ALWAYS">
-               <HBox.margin>
-                  <Insets right="13.0" top="5.0" />
-               </HBox.margin>
-            </ProgressBar>
+            <children>
+               <CheckBox fx:id="showBrowserCb" mnemonicParsing="false" onAction="#showBrowserHandler" selected="true" text="Show browser" HBox.hgrow="ALWAYS">
+                  <font>
+                     <Font size="14.0" />
+                  </font>
+                  <opaqueInsets>
+                     <Insets />
+                  </opaqueInsets>
+               </CheckBox>
+               <CheckBox mnemonicParsing="false" selected="true" text="Go to a random page" HBox.hgrow="ALWAYS">
+                  <font>
+                     <Font size="14.0" />
+                  </font>
+               </CheckBox>
+            </children>
          </HBox>
-         <CheckBox mnemonicParsing="false" selected="true" text="Go to a random page">
-            <font>
-               <Font size="14.0" />
-            </font>
-            <VBox.margin>
-               <Insets left="20.0" top="10.0" />
-            </VBox.margin>
-         </CheckBox>
       </VBox>
    </AnchorPane>
-   <TabPane fx:id="tabPane" prefHeight="262.0" prefWidth="834.0" tabClosingPolicy="UNAVAILABLE" />
+   <TabPane fx:id="tabPane" prefHeight="297.0" prefWidth="840.0" tabClosingPolicy="UNAVAILABLE" />
 </SplitPane>
