@@ -150,6 +150,8 @@ public class Controller {
             webEngine.load(newUrl);
             tab.setText(pageNumber + newUrl.replaceAll(".html", ""));
         }
+        else
+            tab.setText(Integer.toString(pageNumber));
     }
 
     @FXML
