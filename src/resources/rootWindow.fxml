@@ -35,7 +35,7 @@
                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
             </rowConstraints>
-            <Label text="Repetitions" GridPane.rowIndex="1">
+            <Label text="Visits number" GridPane.rowIndex="1">
                <GridPane.margin>
                   <Insets/>
                </GridPane.margin>
