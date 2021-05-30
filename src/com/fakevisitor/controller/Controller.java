@@ -2,16 +2,11 @@ package com.fakevisitor.controller;
 
 import com.fakevisitor.Toast;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -31,13 +26,11 @@ public class Controller {
     public static String URL = "https://www.google.ru/";
 
     @FXML
-    private SplitPane splitPane;
-    @FXML
     private TextField urlInput;
     @FXML
-    private TextField repetitionsInput;
+    private TextField visitsNumberInput;
     @FXML
-    private TextField delayInput;
+    private TextField visitDurationInput;
     @FXML
     private CheckBox showBrowserCb;
     @FXML
@@ -59,12 +52,12 @@ public class Controller {
     public void initialize(){
         stopBtn.setDisable(true);
         visitorService = createVisitorService();
-        progressLabel.setText(0 + "/" + Integer.parseInt(repetitionsInput.getText()));
-        repetitionsInput.textProperty().addListener(
+        progressLabel.setText(0 + "/" + Integer.parseInt(visitsNumberInput.getText()));
+        visitsNumberInput.textProperty().addListener(
                 (ov, oldValue, newValue) ->
                 {
                     try {
-                        progressLabel.setText(0 + "/" + Integer.parseInt(repetitionsInput.getText()));
+                        progressLabel.setText(0 + "/" + Integer.parseInt(visitsNumberInput.getText()));
                     } catch (NumberFormatException e){
                         progressLabel.setText(0 + "/" + 0);
                     }
@@ -83,7 +76,7 @@ public class Controller {
                     protected Void call() throws Exception {
                         //Background work
                         final CountDownLatch latch = new CountDownLatch(1);
-                        for (int i = 0; i < Integer.parseInt(repetitionsInput.getText()); i++) {
+                        for (int i = 0; i < Integer.parseInt(visitsNumberInput.getText()); i++) {
                             int finalI = i;
                             Platform.runLater(() -> {
                                 try {
@@ -97,7 +90,7 @@ public class Controller {
                             latch.await();
                             //background work
                             try {
-                                Thread.sleep(Integer.parseInt(delayInput.getText()) * 1000L);
+                                Thread.sleep(Integer.parseInt(visitDurationInput.getText()) * 1000L);
                             } catch (InterruptedException e) {
                                 Thread.currentThread().interrupt();
                                 return null;
@@ -118,20 +111,20 @@ public class Controller {
         WebEngine webEngine = webView.getEngine();
         webEngine.load(urlInput.getText().equals("") ? URL : urlInput.getText());
         if (goToRandomPageCb.isSelected())
-            goToRandomPage(urlInput.getText(), webEngine, pageNumber+1, tab);
+            goToRandomPage(urlInput.getText(), webEngine, tab);
         tab.setContent(webView);
         if (pageNumber > 0)
             tabPane.getTabs().remove(0);
         tabPane.getTabs().add(tab);
         manager.getCookieStore().removeAll();
-        progressLabel.setText(pageNumber+1 + "/" + Integer.parseInt(repetitionsInput.getText()));
-        if (pageNumber == Integer.parseInt(repetitionsInput.getText())-1){
+        progressLabel.setText(pageNumber+1 + "/" + Integer.parseInt(visitsNumberInput.getText()));
+        if (pageNumber == Integer.parseInt(visitsNumberInput.getText())-1){
             startBtn.setDisable(false);
             stopBtn.setDisable(true);
         }
     }
 
-    public void goToRandomPage(String url, WebEngine webEngine, int pageNumber, Tab tab) throws IOException {
+    public void goToRandomPage(String url, WebEngine webEngine, Tab tab) throws IOException {
         ArrayList<String> links = new ArrayList<>();
         Document doc = Jsoup.connect(url).get();
         Elements elements = doc.select("a[href]"); // a with href
@@ -150,37 +143,50 @@ public class Controller {
         if (links.size() > 0) {
             String newUrl = rootUrl + links.get(new Random().nextInt(links.size() - 1));
             webEngine.load(newUrl);
-            tab.setText(pageNumber + newUrl.replaceAll(".html", ""));
+            tab.setText(newUrl
+                    .replaceAll("\\.html", "")
+                    .replaceAll("http://", "")
+                    .replaceAll("https://", "")
+                    .replaceAll("www\\.", ""));
         }
         else
-            tab.setText(Integer.toString(pageNumber));
+            tab.setText(urlInput.getText()
+                    .replaceAll("http://", "")
+                    .replaceAll("https://", "")
+                    .replaceAll("www\\.", ""));
+    }
+
+    public void changeFieldsState(boolean state){
+        startBtn.setDisable(state);
+        stopBtn.setDisable(!state);
+        urlInput.setDisable(state);
+        visitsNumberInput.setDisable(state);
+        visitDurationInput.setDisable(state);
+        goToRandomPageCb.setDisable(state);
     }
 
     @FXML
     public void onStartClick() {
-        if (repetitionsInput.getText().isEmpty() || delayInput.getText().isEmpty()) {
+        if (visitsNumberInput.getText().isEmpty() || visitDurationInput.getText().isEmpty()) {
             Toast.makeText((Stage)ap.getScene().getWindow(), "Fill in all the fields!", 1000, 500, 500);
             return;
         }
         tabPane.getTabs().clear();
-        startBtn.setDisable(true);
-        stopBtn.setDisable(false);
-        goToRandomPageCb.setDisable(true);
+        changeFieldsState(true);
         int seconds = LocalTime.now().getHour()*3600 +
                 LocalTime.now().getMinute()*60 +
                 LocalTime.now().getSecond() +
-                (Integer.parseInt(repetitionsInput.getText())-1)*Integer.parseInt(delayInput.getText());
+                (Integer.parseInt(visitsNumberInput.getText())-1)*Integer.parseInt(visitDurationInput.getText());
         finishTimer.setText(""+LocalTime.of(seconds % (3600*24) / 3600, (seconds % 3600)/60%60, seconds % 60));
         visitorService.restart();
     }
 
     @FXML
     public void onStopClick(){
-        startBtn.setDisable(false);
-        stopBtn.setDisable(true);
-        goToRandomPageCb.setDisable(false);
+        changeFieldsState(false);
         visitorService.cancel();
         finishTimer.setText(""+LocalTime.of(0, 0)+":00");
+        progressLabel.setText("0/0");
     }
 
     @FXML

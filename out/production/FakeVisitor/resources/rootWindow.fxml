@@ -65,7 +65,7 @@
                   <Insets left="20.0" top="10.0" />
                </padding>
             </Label>
-            <TextField fx:id="repetitionsInput" text="5" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <TextField fx:id="visitsNumberInput" text="5" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
@@ -73,7 +73,7 @@
                   <Insets right="10.0" top="10.0" />
                </GridPane.margin>
             </TextField>
-            <TextField fx:id="delayInput" text="60" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <TextField fx:id="visitDurationInput" text="60" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <GridPane.margin>
                   <Insets right="10.0" top="10.0" />
                </GridPane.margin>
