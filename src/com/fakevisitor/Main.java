@@ -21,14 +21,14 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("Fake Visitor");
-        primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("browser.png")));
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/browser.png")));
         showBaseWindow();
     }
 
     public void showBaseWindow() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(Main.class.getResource("/resources/rootWindow.fxml"));
+            loader.setLocation(getClass().getResource("/rootWindow.fxml"));
             SplitPane rootLayout = loader.load();
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);

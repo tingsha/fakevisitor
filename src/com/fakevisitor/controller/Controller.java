@@ -2,11 +2,16 @@ package com.fakevisitor.controller;
 
 import com.fakevisitor.Toast;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -26,6 +31,8 @@ public class Controller {
     public static String URL = "https://www.google.ru/";
 
     @FXML
+    private SplitPane splitPane;
+    @FXML
     private TextField urlInput;
     @FXML
     private TextField repetitionsInput;
@@ -33,6 +40,8 @@ public class Controller {
     private TextField delayInput;
     @FXML
     private CheckBox showBrowserCb;
+    @FXML
+    private CheckBox goToRandomPageCb;
     @FXML
     private Button startBtn;
     @FXML
@@ -43,15 +52,12 @@ public class Controller {
     private Label finishTimer;
     @FXML
     private Label progressLabel;
-    @FXML
-    private ProgressBar progressBar;
 
     @FXML private AnchorPane ap;
 
     @FXML
     public void initialize(){
         stopBtn.setDisable(true);
-        progressBar.setProgress(0);
         visitorService = createVisitorService();
         progressLabel.setText(0 + "/" + Integer.parseInt(repetitionsInput.getText()));
         repetitionsInput.textProperty().addListener(
@@ -105,24 +111,21 @@ public class Controller {
     }
 
     public void loadNewTab(int pageNumber) throws IOException, InterruptedException {
-        double progressTick = 1/Double.parseDouble(repetitionsInput.getText());
         CookieManager manager = new java.net.CookieManager();
         CookieHandler.setDefault(manager);
         Tab tab = new Tab();
         WebView webView = new WebView();
         WebEngine webEngine = webView.getEngine();
         webEngine.load(urlInput.getText().equals("") ? URL : urlInput.getText());
-        goToRandomPage(urlInput.getText(), webEngine, pageNumber+1, tab);
+        if (goToRandomPageCb.isSelected())
+            goToRandomPage(urlInput.getText(), webEngine, pageNumber+1, tab);
         tab.setContent(webView);
         if (pageNumber > 0)
             tabPane.getTabs().remove(0);
         tabPane.getTabs().add(tab);
         manager.getCookieStore().removeAll();
         progressLabel.setText(pageNumber+1 + "/" + Integer.parseInt(repetitionsInput.getText()));
-        progressBar.setProgress(progressBar.getProgress() + progressTick);
         if (pageNumber == Integer.parseInt(repetitionsInput.getText())-1){
-            progressBar.setProgress(1);
-            progressBar.setStyle("-fx-accent: green");
             startBtn.setDisable(false);
             stopBtn.setDisable(true);
         }
@@ -162,6 +165,7 @@ public class Controller {
         tabPane.getTabs().clear();
         startBtn.setDisable(true);
         stopBtn.setDisable(false);
+        goToRandomPageCb.setDisable(true);
         int seconds = LocalTime.now().getHour()*3600 +
                 LocalTime.now().getMinute()*60 +
                 LocalTime.now().getSecond() +
@@ -174,9 +178,9 @@ public class Controller {
     public void onStopClick(){
         startBtn.setDisable(false);
         stopBtn.setDisable(true);
+        goToRandomPageCb.setDisable(false);
         visitorService.cancel();
         finishTimer.setText(""+LocalTime.of(0, 0)+":00");
-        progressBar.setProgress(0);
     }
 
     @FXML
